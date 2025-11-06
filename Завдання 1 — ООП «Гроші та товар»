@@ -1,0 +1,210 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ConsoleApp_HW2_
+{
+    // Клас Money — для роботи з грошима певної валюти
+    class Money
+    {
+        private int whole;
+        private int coins; // копійки (0–99)
+        private string currency; // валюта
+
+        public int Whole
+        {
+            get { return whole; }
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentException("Ціла частина не може бути від’ємною.");
+                whole = value;
+            }
+        }
+
+        public int Coins
+        {
+            get { return coins; }
+            set
+            {
+                if (value < 0 || value > 99)
+                    throw new ArgumentException("Копійки мають бути в межах 0–99.");
+                coins = value;
+            }
+        }
+
+        public string Currency
+        {
+            get { return currency; }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new ArgumentException("Назва валюти не може бути порожньою.");
+                currency = value;
+            }
+        }
+
+        // Конструктор
+        public Money(int whole, int coins, string currency)
+        {
+            Whole = whole;
+            Coins = coins;
+            Currency = currency;
+        }
+
+        // Метод виведення суми
+        public void Show()
+        {
+            Console.WriteLine($"{whole}.{coins:D2} {currency}");
+        }
+
+        // Метод задання суми з перевіркою
+        public void SetAmount(int whole, int coins)
+        {
+            if (whole < 0 || coins < 0 || coins > 99)
+            {
+                Console.WriteLine("Некоректне значення суми!");
+                return;
+            }
+
+            Whole = whole;
+            Coins = coins;
+        }
+
+        // Метод додавання грошей
+        public void Add(Money other)
+        {
+            if (Currency != other.Currency)
+            {
+                Console.WriteLine("Неможливо додати різні валюти!");
+                return;
+            }
+
+            int totalCoins = this.ToCents() + other.ToCents();
+            FromCents(totalCoins);
+        }
+
+        // Метод зменшення грошей
+        public void Subtract(Money other)
+        {
+            if (Currency != other.Currency)
+            {
+                Console.WriteLine("Неможливо відняти різні валюти!");
+                return;
+            }
+
+            int totalCoins = this.ToCents() - other.ToCents();
+            if (totalCoins < 0)
+                totalCoins = 0;
+
+            FromCents(totalCoins);
+        }
+
+        // Перетворення у копійки
+        private int ToCents() => whole * 100 + coins;
+
+        // З копійок у гривні/копійки
+        private void FromCents(int totalCents)
+        {
+            Whole = totalCents / 100;
+            Coins = totalCents % 100;
+        }
+    }
+
+    // Клас Product — товар з ціною типу Money
+    class Product
+    {
+        public string Name { get; set; }
+        public Money Price { get; set; }
+
+        public Product(string name, Money price)
+        {
+            Name = name;
+            Price = price;
+        }
+
+        // Збільшити ціну
+        public void IncreasePrice(Money amount)
+        {
+            Price.Add(amount);
+        }
+
+        // Зменшити ціну
+        public void DecreasePrice(Money amount)
+        {
+            Price.Subtract(amount);
+        }
+
+        public void ShowInfo()
+        {
+            Console.Write($"{Name}: ");
+            Price.Show();
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            Console.Title = "Робота з класами Money та Product";
+
+            Money startPrice = new Money(120, 50, "грн");
+            Product p = new Product("Laptop", startPrice);
+
+            while (true)
+            {
+                Console.WriteLine("\n=== МЕНЮ ===");
+                Console.WriteLine("1. Показати інформацію про товар");
+                Console.WriteLine("2. Збільшити ціну");
+                Console.WriteLine("3. Зменшити ціну");
+                Console.WriteLine("4. Задати нову суму вручну");
+                Console.WriteLine("0. Вихід");
+                Console.Write("Вибір: ");
+
+                string choice = Console.ReadLine();
+
+                if (choice == "0") break;
+
+                switch (choice)
+                {
+                    case "1":
+                        p.ShowInfo();
+                        break;
+
+                    case "2":
+                        Console.Write("На скільки збільшити (грн): ");
+                        int addH = int.Parse(Console.ReadLine());
+                        Console.Write("Копійки: ");
+                        int addC = int.Parse(Console.ReadLine());
+                        p.IncreasePrice(new Money(addH, addC, p.Price.Currency));
+                        Console.WriteLine("Ціну оновлено!");
+                        break;
+
+                    case "3":
+                        Console.Write("На скільки зменшити (грн): ");
+                        int subH = int.Parse(Console.ReadLine());
+                        Console.Write("Копійки: ");
+                        int subC = int.Parse(Console.ReadLine());
+                        p.DecreasePrice(new Money(subH, subC, p.Price.Currency));
+                        Console.WriteLine("Ціну оновлено!");
+                        break;
+
+                    case "4":
+                        Console.Write("Введіть нову суму (грн): ");
+                        int newH = int.Parse(Console.ReadLine());
+                        Console.Write("Копійки: ");
+                        int newC = int.Parse(Console.ReadLine());
+                        p.Price.SetAmount(newH, newC);
+                        break;
+
+                    default:
+                        Console.WriteLine("Невірний вибір!");
+                        break;
+                }
+            }
+        }
+    }
+}
