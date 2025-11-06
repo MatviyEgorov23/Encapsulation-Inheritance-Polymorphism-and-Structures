@@ -1,0 +1,188 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DecimalNumberApp
+{
+    // Структура для роботи з десятковим числом
+    struct DecimalNumber
+    {
+        public int Number { get; set; }
+
+        public DecimalNumber(int number)
+        {
+            Number = number;
+        }
+
+        public string ToBinary()
+        {
+            return Convert.ToString(Number, 2);
+        }
+
+        public string ToOctal()
+        {
+            return Convert.ToString(Number, 8);
+        }
+
+        public string ToHex()
+        {
+            return Convert.ToString(Number, 16).ToUpper();
+        }
+
+        public override string ToString()
+        {
+            return Number.ToString();
+        }
+    }
+
+    // Клас Money (оновлений з Equals і GetHashCode)
+    class Money
+    {
+        private int whole; // гривні
+        private int coins; // копійки (0–99)
+        private string currency;
+
+        public int Whole
+        {
+            get => whole;
+            set
+            {
+                if (value < 0) throw new ArgumentException("Ціла частина не може бути від’ємною.");
+                whole = value;
+            }
+        }
+
+        public int Coins
+        {
+            get => coins;
+            set
+            {
+                if (value < 0 || value > 99)
+                    throw new ArgumentException("Копійки мають бути в межах 0–99.");
+                coins = value;
+            }
+        }
+
+        public string Currency
+        {
+            get => currency;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new ArgumentException("Валюта не може бути порожньою.");
+                currency = value;
+            }
+        }
+
+        public Money(int whole, int coins, string currency)
+        {
+            Whole = whole;
+            Coins = coins;
+            Currency = currency;
+        }
+
+        public override string ToString()
+        {
+            return $"{Whole}.{Coins:D2} {Currency}";
+        }
+
+        // Перевизначення Equals для порівняння цін
+        public override bool Equals(object obj)
+        {
+            if (obj is Money other)
+            {
+                return this.Currency == other.Currency &&
+                       this.ToCents() == other.ToCents();
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 23 + ToCents().GetHashCode();
+                hash = hash * 23 + (Currency != null ? Currency.GetHashCode() : 0);
+                return hash;
+            }
+        }
+
+
+        // Допоміжний метод — сума в копійках
+        private int ToCents() => Whole * 100 + Coins;
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            Console.Title = "DecimalNumber + Money Demo";
+
+            while (true)
+            {
+                Console.WriteLine("\n=== МЕНЮ ===");
+                Console.WriteLine("1. Перетворити десяткове число");
+                Console.WriteLine("2. Порівняти два об'єкти Money");
+                Console.WriteLine("0. Вихід");
+                Console.Write("Ваш вибір: ");
+                string choice = Console.ReadLine();
+
+                if (choice == "0") break;
+
+                switch (choice)
+                {
+                    case "1":
+                        Console.Write("Введіть ціле число: ");
+                        if (int.TryParse(Console.ReadLine(), out int num))
+                        {
+                            DecimalNumber dn = new DecimalNumber(num);
+                            Console.WriteLine($"\nДесяткове: {dn}");
+                            Console.WriteLine($"Двійкове: {dn.ToBinary()}");
+                            Console.WriteLine($"Вісімкове: {dn.ToOctal()}");
+                            Console.WriteLine($"Шістнадцяткове: {dn.ToHex()}");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Некоректне число!");
+                        }
+                        break;
+
+                    case "2":
+                        Console.Write("Введіть першу суму (грн): ");
+                        int w1 = int.Parse(Console.ReadLine());
+                        Console.Write("Копійки: ");
+                        int c1 = int.Parse(Console.ReadLine());
+                        Console.Write("Валюта: ");
+                        string cur1 = Console.ReadLine();
+
+                        Console.Write("Введіть другу суму (грн): ");
+                        int w2 = int.Parse(Console.ReadLine());
+                        Console.Write("Копійки: ");
+                        int c2 = int.Parse(Console.ReadLine());
+                        Console.Write("Валюта: ");
+                        string cur2 = Console.ReadLine();
+
+                        Money m1 = new Money(w1, c1, cur1);
+                        Money m2 = new Money(w2, c2, cur2);
+
+                        Console.WriteLine($"\nПерша сума: {m1}");
+                        Console.WriteLine($"Друга сума: {m2}");
+
+                        if (m1.Equals(m2))
+                            Console.WriteLine("Суми рівні!");
+                        else
+                            Console.WriteLine("Суми різні!");
+                        break;
+
+                    default:
+                        Console.WriteLine("Невірний вибір!");
+                        break;
+                }
+            }
+        }
+    }
+}
