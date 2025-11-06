@@ -1,0 +1,149 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ConsoleApp_HW2._2_
+{
+
+    abstract class MusicalInstrument
+    {
+        private string name;
+        private string description;
+        private string history;
+
+        public string Name
+        {
+            get { return name; }
+            protected set { name = value; }
+        }
+
+        public string Description
+        {
+            get { return description; }
+            protected set { description = value; }
+        }
+
+        public string History
+        {
+            get { return history; }
+            protected set { history = value; }
+        }
+
+        // Конструктор
+        protected MusicalInstrument(string name, string description, string history)
+        {
+            Name = name;
+            Description = description;
+            History = history;
+        }
+
+        // Віртуальні методи для перевизначення
+        public virtual void Show()
+        {
+            Console.WriteLine($"Інструмент: {Name}");
+        }
+
+        public virtual void Desc()
+        {
+            Console.WriteLine($"Опис: {Description}");
+        }
+
+        public virtual void HistoryInfo()
+        {
+            Console.WriteLine($"Історія: {History}");
+        }
+    }
+
+    // Похідний клас: Скрипка
+    class Violin : MusicalInstrument
+    {
+        public Violin()
+            : base("Скрипка",
+                  "Струнний смичковий інструмент з чотирма струнами.",
+                  "З'явилась у XVI столітті в Італії, походить від старих струнних інструментів — ребек та віола.")
+        { }
+
+        public override void Show()
+        {
+            Console.WriteLine($"{Name}");
+        }
+    }
+
+    // Похідний клас: Тромбон
+    class Trombone : MusicalInstrument
+    {
+        public Trombone()
+            : base("Тромбон",
+                  "Мідний духовий інструмент з рухомою кулісою для зміни тону.",
+                  "З'явився у XV столітті. Є нащадком стародавнього сакбуту, який використовувався в церковній музиці.")
+        { }
+
+        public override void Show()
+        {
+            Console.WriteLine($"{Name}");
+        }
+    }
+
+    // Похідний клас: Укулеле
+    class Ukulele : MusicalInstrument
+    {
+        public Ukulele()
+            : base("Укулеле",
+                  "Невелика чотириструнна гітара, що походить з Гаваїв.",
+                  "З'явилась наприкінці XIX століття на Гаваях, має португальське коріння.")
+        { }
+
+        public override void Show()
+        {
+            Console.WriteLine($"{Name}");
+        }
+    }
+
+    // Похідний клас: Віолончель
+    class Cello : MusicalInstrument
+    {
+        public Cello()
+            : base("Віолончель",
+                  "Струнний смичковий інструмент, більший за скрипку, з глибоким звуком.",
+                  "Розвинулася в Італії у XVI столітті як частина сімейства віол, і стала основою симфонічного оркестру.")
+        { }
+
+        public override void Show()
+        {
+            Console.WriteLine($"{Name}");
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            Console.Title = "Музичні інструменти";
+
+            List<MusicalInstrument> orchestra = new List<MusicalInstrument>()
+            {
+                new Violin(),
+                new Trombone(),
+                new Ukulele(),
+                new Cello()
+            };
+
+            Console.WriteLine("=== Оркестр ===\n");
+
+            foreach (var instrument in orchestra)
+            {
+                instrument.Show();
+                instrument.Desc();
+                instrument.HistoryInfo();
+
+                Console.WriteLine(new string('-', 50));
+            }
+
+            Console.WriteLine("Демонстрація завершена!");
+        
+        }
+    }
+}
